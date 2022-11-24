@@ -1,0 +1,3 @@
+{"broadcast":["cd"],"user":"ab","timestamp":100,"values":{"foo":"bar"}}
+{"broadcast":["cd","ef"],"user":"ab","timestamp":99,"values":{"baz":"crux"}}
+{"broadcast":["cd"],"user":"ab","timestamp":101,"values":{"foo":"bar"}}
