@@ -16,41 +16,35 @@ public class StateStorage {
     }
 
     /**
-     * Updates the current state of a user
+     * Updates the current state of a user and returns all changes
      * @param user the user whose state is updated
      * @param timestamp the timestamp of the update
      * @param values the new state
-     * @return true if the state changed in any way, false otherwise
+     * @return a map containing all key and values changed during the update
      */
-    public boolean updateState(String user, long timestamp, Map<String, String> values) {
-        Set<String> oldKeys = map.getOrDefault(user, Collections.emptyMap()).keySet();
-        Map<String, StorageValue> newMap = new HashMap<>();
+    public Map<String, String> updateState(String user, long timestamp, Map<String, String> values) {
+        Map<String, String> changes = new HashMap<>();
 
-        // Checks if the state changed in any way
-        boolean didStateChange = false;
+        // If user does not exist, create a new map for him
+        if(!map.containsKey(user)) {
+            map.put(user, new HashMap<>());
+        }
 
+        // For every key-value in the update
         for(String k : values.keySet()) {
-            if(oldKeys.contains(k)) {
-                // Check if the old key-value is older than the new one
-                // If it is, replace it with the new one
-                if(map.get(user).get(k).getTimestamp() < timestamp) {
-                    newMap.put(k, new StorageValue(timestamp, values.get(k)));
-                    didStateChange = true;
-                }
-            }
 
-            // If one of the new key-value didn't exist before, add it
-            else {
-                newMap.put(k, new StorageValue(timestamp, values.get(k)));
-                didStateChange = true;
+            // if map already contained an older key        or
+            // if map didn't contain that key
+            if((map.get(user).containsKey(k) && map.get(user).get(k).getTimestamp() < timestamp) || !map.get(user).containsKey(k)) {
+                // Update the state
+                map.get(user).put(k, new StorageValue(timestamp, values.get(k)));
+
+                // Add it to changes
+                changes.put(k, values.get(k));
             }
         }
 
-        // If state changed
-        if(didStateChange)
-            map.put(user, newMap);
-
-        return didStateChange;
+        return changes;
     }
 
     /**

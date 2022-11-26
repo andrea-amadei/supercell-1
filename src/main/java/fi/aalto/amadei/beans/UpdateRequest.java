@@ -29,15 +29,16 @@ public class UpdateRequest implements Request {
 
     @Override
     public void execute(FriendshipMap friendshipMap, StateStorage stateStorage) {
+        Map<String, String> changes = stateStorage.updateState(user, timestamp, values);
         // If a storage update changed the user's state in any way
-        if(stateStorage.updateState(user, timestamp, values)) {
+        if(changes.size() != 0) {
 
             // If the executing user has no friends, don't do anything
             if(friendshipMap.getFriends(user).size() == 0)
                 return;
 
             // Create a new response
-            Response response = new Response(friendshipMap.getFriends(user), user, timestamp, stateStorage.getState(user));
+            Response response = new Response(friendshipMap.getFriends(user), user, timestamp, changes);
 
             // Stringify it and print it
             System.out.println(Instances.gson().toJson(response));
